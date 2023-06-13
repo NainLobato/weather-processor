@@ -1,3 +1,9 @@
+import { CronJob } from 'cron';
 import weatherService from './core/services/weatherService';
 
-weatherService.startProcess();
+const job = new CronJob('0 * * * *', () => {
+  console.log('Starting process...');
+  weatherService.startProcess();
+});
+
+job.start();
