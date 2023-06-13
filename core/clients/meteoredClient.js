@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 const METEORED_HOST = 'https://www.meteored.mx';
 
@@ -36,4 +36,4 @@ const getHistoricData = async (city) => axios.get(`${METEORED_HOST}/${city}/hist
     return { config: mapppedConfig, status: statusCode };
   })
 
-module.exports = { getHistoricData };
+export default { getHistoricData };

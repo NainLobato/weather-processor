@@ -11,7 +11,7 @@ const {
   OUTPUTS_PATH = DEFAULT_OUTPUTS_PATH,
 } = process.env;
 
-module.exports = {
+export default {
   CITIES,
   OUTPUTS_PATH,
 };

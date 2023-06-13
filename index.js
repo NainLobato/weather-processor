@@ -1,3 +1,3 @@
-const weatherService = require('./core/services/weatherService');
+import weatherService from './core/services/weatherService';
 
 weatherService.startProcess();

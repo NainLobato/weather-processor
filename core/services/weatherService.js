@@ -1,7 +1,7 @@
-const fs = require("fs");
-const cheerio = require('cheerio');
-const env = require('../../config/environment');
-const meteoredClient = require('../clients/meteoredClient');
+import fs from 'fs';
+import cheerio from 'cheerio';
+import env from '../../config/environment';
+import meteoredClient from '../clients/meteoredClient';
 
 const {
   CITIES,
@@ -74,4 +74,4 @@ const startProcess = async () => {
   }
 };
 
-module.exports = { startProcess };
+export default { startProcess };
