@@ -2,11 +2,11 @@ import fs from 'fs';
 import cheerio from 'cheerio';
 import env from '../../config/environment';
 import meteoredClient from '../clients/meteoredClient';
+import City from '../../domain/models/City';
+import Request from '../../domain/models/Request';
+import SuccessfulResponse from '../../domain/models/SuccessfulResponse';
 
-const {
-  CITIES,
-  OUTPUTS_PATH,
-} = env;
+const { OUTPUTS_PATH } = env;
 const dateRegex = /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/;
 
 const scrapeHistoricalData = async (data) => {
@@ -44,13 +44,37 @@ const createFile = (timestamp, data) => {
   const json = JSON.stringify(data);
   fs.writeFileSync(`outputs/${timestamp}.json`, json);
   console.log(`Done, file created: outputs/${timestamp}.json`);
-}
+};
+
+const saveResponses = async (runId, cities, data) => {
+  const promises = data.map(async (requestData) => {
+    const { url, status, data } = requestData;
+    const [,,,cityName] = url.split('/');
+    const city = cities.find(({ name }) => name === cityName);
+    const request = await Request.insert({
+      city_id: city.id,
+      run_id: runId,
+      url,
+      response_code: status,
+    });
+    if (status === 200) {
+      await SuccessfulResponse.insert({
+        request_id: request.id,
+        data,
+      });
+    }
+  });
+
+  await Promise.all(promises);
+  console.log('Done, responses saved in DB');
+};
 
 const startProcess = async () => {
   try {
     const id = Date.now();
-    const promises = CITIES.map(async (city) => {
-      const { data, status, config: { url } = {} } = await meteoredClient.getHistoricData(city);
+    const cities = await City.findAll({});
+    const promises = cities.map(async ({ name }) => {
+      const { data, status, config: { url } = {} } = await meteoredClient.getHistoricData(name);
   
       let weatherData = null;
       if (status === 200) {
@@ -69,6 +93,7 @@ const startProcess = async () => {
     const responses = await Promise.all(promises);
     
     createFile(id, responses);
+    await saveResponses(id, cities, responses);
   } catch (error) {
     console.error('Error:', error);
   }

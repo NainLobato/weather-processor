@@ -1,17 +1,21 @@
-const DEFAULT_CITIES = [
-  'ciudad-de-mexico',
-  'monterrey',
-  'merida',
-  'wakanda'
-];
 const DEFAULT_OUTPUTS_PATH = './outputs';
 
 const {
-  CITIES = DEFAULT_CITIES,
   OUTPUTS_PATH = DEFAULT_OUTPUTS_PATH,
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME,
+  DB_HOST,
+  DB_PORT,
+  QUERY_LOGS,
 } = process.env;
 
 export default {
-  CITIES,
   OUTPUTS_PATH,
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME,
+  DB_HOST,
+  DB_PORT,
+  QUERY_LOGS,
 };
