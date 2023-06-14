@@ -62,9 +62,19 @@ const saveResponses = async (data) => {
       response_code: status,
     });
     if (status === 200) {
+      const {
+        distance,
+        humidity,
+        temperature,
+        update_date: updateDate,
+      } = data;
+      const [date, time] = updateDate.split(' ');
       await SuccessfulResponse.insert({
         request_id: request.id,
-        data,
+        distance,
+        humidity,
+        temperature,
+        update_date: `${date.split('/').reverse().join('-')} ${time}`,
       });
     }
   });
