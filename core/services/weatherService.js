@@ -46,13 +46,17 @@ const createFile = (timestamp, data) => {
   console.log(`Done, file created: outputs/${timestamp}.json`);
 };
 
-const saveResponses = async (runId, cities, data) => {
+const saveResponses = async (data) => {
   const promises = data.map(async (requestData) => {
-    const { url, status, data } = requestData;
-    const [,,,cityName] = url.split('/');
-    const city = cities.find(({ name }) => name === cityName);
+    const {
+      run_id: runId,
+      city_id: cityId,
+      url,
+      status,
+      data,
+    } = requestData;
     const request = await Request.insert({
-      city_id: city.id,
+      city_id: cityId,
       run_id: runId,
       url,
       response_code: status,
@@ -71,9 +75,9 @@ const saveResponses = async (runId, cities, data) => {
 
 const startProcess = async () => {
   try {
-    const id = Date.now();
+    const runId = Date.now();
     const cities = await City.findAll({});
-    const promises = cities.map(async ({ name }) => {
+    const promises = cities.map(async ({ id, name }) => {
       const { data, status, config: { url } = {} } = await meteoredClient.getHistoricData(name);
   
       let weatherData = null;
@@ -83,7 +87,8 @@ const startProcess = async () => {
       }
   
       return {
-        id,
+        run_id: runId,
+        city_id: id,
         url,
         status,
         data: weatherData,
@@ -92,8 +97,8 @@ const startProcess = async () => {
 
     const responses = await Promise.all(promises);
     
-    createFile(id, responses);
-    await saveResponses(id, cities, responses);
+    createFile(runId, responses);
+    await saveResponses(responses);
   } catch (error) {
     console.error('Error:', error);
   }
