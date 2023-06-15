@@ -15,4 +15,34 @@ const insert = (data, transaction = null) => getModel(transaction)
   .insert(data)
   .then(([item]) => item);
 
-export default { insert };
+const findMax = (where, maxToFind, transaction = null) => getModel(transaction)
+  .innerJoin('requests', 'requests.id', 'successful_responses.request_id')
+  .where(where)
+  .max(maxToFind)
+  .first();
+
+const findMin = (where, minToFind, transaction = null) => getModel(transaction)
+  .innerJoin('requests', 'requests.id', 'successful_responses.request_id')
+  .where(where)
+  .min(minToFind)
+  .first();
+
+const getAvg = (where, avgToFind, transaction = null) => getModel(transaction)
+  .innerJoin('requests', 'requests.id', 'successful_responses.request_id')
+  .where(where)
+  .avg(avgToFind)
+  .first();
+
+const findLast = (where, transaction = null) => getModel(transaction)
+  .innerJoin('requests', 'requests.id', 'successful_responses.request_id')
+  .where(where)
+  .orderBy('successful_responses.created_at', 'desc')
+  .first();
+
+export default {
+  insert,
+  findMax,
+  findMin,
+  getAvg,
+  findLast,
+};
